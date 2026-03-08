@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { getCopy } from '../../lib/copy';
+import { getBlogPosts, getProjects } from '../../lib/sanity/queries';
+import { isLocale, locales, type Locale } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang || 'en';
+if (!isLocale(lang)) {
+  throw new Error('Invalid locale');
+}
+
+const locale = lang as Locale;
+const copy = getCopy(locale);
+const projects = await getProjects(locale);
+const posts = await getBlogPosts(locale);
+const featured = projects.filter((item) => item.featured).slice(0, 3);
+const latestPosts = posts.slice(0, 3);
+---
+
+<BaseLayout locale={locale} copy={copy} pathWithoutLocale="">
+  <section class="hero card">
+    <div class="hero-copy">
+      <p class="eyebrow">{copy.siteTitle}</p>
+      <h1>{copy.heroGreeting}</h1>
+      <p>{copy.heroIntro}</p>
+      <p>{copy.heroWebsiteIntro}</p>
+    </div>
+    <div class="hero-media" role="img" aria-label={copy.heroImageLabel}></div>
+  </section>
+
+  <section>
+    <h2>{copy.featured}</h2>
+    <div class="section-callout card">
+      <p>{copy.projectIntro}</p>
+      <a class="pill-link" href={`/${locale}/projects`}>
+        <span>{copy.allProjects}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h15A1.5 1.5 0 0 1 21 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5v-11zm4 2.5a1 1 0 1 0 0 2h10a1 1 0 1 0 0-2H7zm0 4a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H7z" />
+        </svg>
+      </a>
+    </div>
+    <div class="grid">
+      {featured.map((project) => <ProjectCard project={project} locale={locale} viewLabel={copy.viewProject} />)}
+    </div>
+  </section>
+
+  <section>
+    <h2>{copy.latestPosts}</h2>
+    <div class="section-callout card">
+      <p>{copy.blogIntro}</p>
+      <a class="pill-link" href={`/${locale}/blog`}>
+        <span>{copy.allPosts}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 4a2 2 0 0 0-2 2v12.5A1.5 1.5 0 0 0 4.5 20H20a1 1 0 1 0 0-2H6a1 1 0 0 1-1-1V6h11a1 1 0 1 0 0-2H5zm4 4a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H9zm0 4a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H9z" />
+        </svg>
+      </a>
+    </div>
+    <div class="grid">
+      {latestPosts.map((post) => (
+        <BlogCard post={post} locale={locale} readMoreLabel={copy.viewProject} publishedLabel={copy.publishedOn} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding: var(--space-5);
+    margin-bottom: var(--space-4);
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--space-3);
+    align-items: stretch;
+    background:
+      radial-gradient(circle at 12% 20%, color-mix(in srgb, var(--accent) 38%, transparent), transparent 48%),
+      radial-gradient(circle at 86% 78%, color-mix(in srgb, var(--accent-2) 34%, transparent), transparent 52%),
+      linear-gradient(130deg, color-mix(in srgb, var(--paper) 98%, #0a0f18), color-mix(in srgb, var(--paper) 90%, var(--accent) 12%));
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+
+  .hero h1 {
+    margin: 0 0 var(--space-2);
+    font-size: clamp(2rem, 5vw, 4rem);
+  }
+
+  .hero p {
+    margin: 0 0 var(--space-2);
+    max-width: 65ch;
+    color: var(--muted);
+  }
+
+  .eyebrow {
+    margin: 0 0 var(--space-1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--accent-2) 75%, white);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .hero-media {
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+    border-radius: calc(var(--radius) - 2px);
+    border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+    background-image: url('/images/hero.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #0d111a;
+  }
+
+  .hero-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.18));
+    pointer-events: none;
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .section-callout {
+    margin-bottom: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .section-callout p {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 2.2rem;
+    padding: 0 0.9rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+    color: var(--ink);
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .pill-link svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: currentColor;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      grid-template-columns: 1fr;
+      padding: var(--space-3);
+    }
+
+    .hero-media {
+      min-height: 220px;
+    }
+
+    .section-callout {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

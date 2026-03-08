@@ -1,15 +1,33 @@
-# amplifi-beats.github.io
-my new, more minimal (or less non-minimal?) website
-<hr>
+# Sound Engineering Portfolio
 
-## projects I've stolen from
+Bilingual (English/Irish) portfolio powered by Astro (frontend) and Sanity (CMS).
 
-[terminal css](https://terminalcss.xyz/)
+## Requirements
 
-[wavesurfer.js](https://wavesurfer-js.org/)
+- Node.js 20+
+- npm 10+
 
-[amplifibeats](https://amplifibeats.pollux.casa/)
+## Install
 
-## usage or installation
+```bash
+npm install
+```
 
-i'm too lazy to make it easier for others, so good luck :D
+## Run dev servers
+
+```bash
+npm run dev
+```
+
+- Frontend: `http://localhost:4321`
+- Sanity Studio: `http://localhost:3333`
+
+## Build
+
+```bash
+npm run build
+```
+
+## Environment variables
+
+Copy `frontend/.env.example` to `frontend/.env` and fill in your Sanity values.

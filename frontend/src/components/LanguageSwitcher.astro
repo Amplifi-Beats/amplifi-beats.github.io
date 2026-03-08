@@ -1,0 +1,53 @@
+---
+import { alternateLocale, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  pathWithoutLocale: string;
+  label: string;
+}
+
+const { locale, pathWithoutLocale, label } = Astro.props as Props;
+const targetLocale = alternateLocale(locale);
+const href = `/${targetLocale}${pathWithoutLocale}`;
+const currentLocaleCode = locale.toUpperCase();
+const currentFlag = locale === 'en' ? '🇬🇧' : '🇮🇪';
+---
+
+<a class="lang-switch" href={href} aria-label={label} title={label}>
+  <span class="flag" aria-hidden="true">{currentFlag}</span>
+  <span>{currentLocaleCode}</span>
+</a>
+
+<style>
+  .lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+    color: var(--ink);
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: background-color 160ms ease, transform 160ms ease;
+  }
+
+  .lang-switch:hover {
+    background: color-mix(in srgb, var(--accent) 18%, var(--paper));
+    transform: translateY(-1px);
+  }
+
+  .lang-switch:focus-visible {
+    outline: 2px solid var(--accent-2);
+    outline-offset: 2px;
+  }
+
+  .flag {
+    font-size: 1rem;
+    line-height: 1;
+  }
+</style>

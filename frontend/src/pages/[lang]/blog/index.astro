@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BlogCard from '../../../components/BlogCard.astro';
+import { getCopy } from '../../../lib/copy';
+import { getBlogPosts } from '../../../lib/sanity/queries';
+import { isLocale, locales, type Locale } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang || 'en';
+if (!isLocale(lang)) {
+  throw new Error('Invalid locale');
+}
+
+const locale = lang as Locale;
+const copy = getCopy(locale);
+const posts = await getBlogPosts(locale);
+---
+
+<BaseLayout locale={locale} copy={copy} title={copy.allPosts} pathWithoutLocale="/blog">
+  <h1>{copy.allPosts}</h1>
+  <div class="grid">
+    {posts.map((post) => (
+      <BlogCard post={post} locale={locale} readMoreLabel={copy.viewProject} publishedLabel={copy.publishedOn} />
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 0 0 var(--space-3);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-3);
+  }
+</style>

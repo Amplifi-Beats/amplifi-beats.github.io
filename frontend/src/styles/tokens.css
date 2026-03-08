@@ -1,0 +1,54 @@
+:root {
+  --bg: #0f1219;
+  --paper: #171b25;
+  --ink: #e8edf7;
+  --accent: #2ca58d;
+  --accent-2: #ff8a5b;
+  --muted: #9aa6be;
+  --radius: 14px;
+  --shadow: 0 18px 50px rgba(3, 6, 12, 0.45);
+  --space-1: 0.5rem;
+  --space-2: 0.9rem;
+  --space-3: 1.4rem;
+  --space-4: 2.2rem;
+  --space-5: 3.8rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(44, 165, 141, 0.18) 0, transparent 42%),
+    radial-gradient(circle at 85% 30%, rgba(255, 138, 91, 0.14) 0, transparent 40%),
+    radial-gradient(circle at 40% 85%, rgba(70, 110, 180, 0.2) 0, transparent 45%),
+    var(--bg);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--accent);
+}
+
+.wrapper {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.card {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding: var(--space-3);
+  }
+}

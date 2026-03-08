@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"chat.tools.terminal.autoApprove": {
+			"npm --workspace frontend": true,
+			"npm --workspace studio": true
+		}
+	}
+}

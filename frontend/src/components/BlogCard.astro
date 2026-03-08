@@ -1,0 +1,110 @@
+---
+import type { BlogPost } from '../lib/sanity/queries';
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  post: BlogPost;
+  locale: Locale;
+  readMoreLabel: string;
+  publishedLabel: string;
+}
+
+const { post, locale, readMoreLabel, publishedLabel } = Astro.props as Props;
+const publishedDate = new Date(post.publishedAt).toLocaleDateString(locale === 'ga' ? 'ga-IE' : 'en-GB', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric'
+});
+---
+
+<article class="card blog-card">
+  {post.coverImageUrl && <img src={post.coverImageUrl} alt={post.title} loading="lazy" />}
+  <div class="content">
+    <p class="meta">{publishedLabel}: {publishedDate}</p>
+    <h3>{post.title}</h3>
+    <p>{post.excerpt}</p>
+    <a class="pill-link" href={`/${locale}/blog/${post.slug}`}>
+      <span>{readMoreLabel}</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 7a1 1 0 0 0-1-1h-8.6l2.3-2.3A1 1 0 0 0 11.3 2.3l-4 4a1 1 0 0 0 0 1.4l4 4a1 1 0 0 0 1.4-1.4L10.4 8H18v4a4 4 0 0 1-4 4H6a1 1 0 1 0 0 2h8a6 6 0 0 0 6-6V7z" />
+      </svg>
+    </a>
+  </div>
+</article>
+
+<style>
+  .blog-card {
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .content {
+    padding: var(--space-3);
+  }
+
+  .meta {
+    margin: 0 0 var(--space-2);
+    color: var(--muted);
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin: 0 0 var(--space-2);
+  }
+
+  p {
+    margin: 0 0 var(--space-3);
+    color: var(--muted);
+  }
+
+  .pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 2.2rem;
+    padding: 0 0.9rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+    color: var(--ink);
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 160ms ease, transform 160ms ease;
+  }
+
+  .pill-link:hover {
+    background: color-mix(in srgb, var(--accent) 18%, var(--paper));
+    transform: translateY(-1px);
+  }
+
+  .pill-link:focus-visible {
+    outline: 2px solid var(--accent-2);
+    outline-offset: 2px;
+  }
+
+  .pill-link svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: currentColor;
+  }
+
+  @media (max-width: 768px) {
+    .blog-card {
+      grid-template-columns: 1fr;
+    }
+
+    img {
+      max-height: 240px;
+    }
+  }
+</style>

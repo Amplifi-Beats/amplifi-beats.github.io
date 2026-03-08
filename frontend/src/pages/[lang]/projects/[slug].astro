@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import VideoEmbed from '../../../components/VideoEmbed.astro';
+import AudioPlayer from '../../../components/AudioPlayer.astro';
+import SoundCloudEmbed from '../../../components/SoundCloudEmbed.astro';
+import { toHTML } from '@portabletext/to-html';
+import { getCopy } from '../../../lib/copy';
+import { getProjectBySlug, getProjects } from '../../../lib/sanity/queries';
+import { isLocale, locales, type Locale } from '../../../lib/i18n';
+
+export async function getStaticPaths() {
+  const paths = [] as Array<{ params: { lang: Locale; slug: string } }>;
+
+  for (const lang of locales) {
+    const projects = await getProjects(lang);
+    for (const project of projects) {
+      paths.push({
+        params: {
+          lang,
+          slug: project.slug
+        }
+      });
+    }
+  }
+
+  return paths;
+}
+
+const lang = Astro.params.lang || 'en';
+const slug = Astro.params.slug || '';
+
+if (!isLocale(lang)) {
+  throw new Error('Invalid locale');
+}
+
+const locale = lang as Locale;
+const copy = getCopy(locale);
+const project = await getProjectBySlug(locale, slug);
+
+if (!project) {
+  throw new Error('Project not found');
+}
+
+const translatedSlug = locale === 'en' ? project.slugGa : project.slugEn;
+
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+
+const descriptionHtml = Array.isArray(project.description)
+  ? toHTML(project.description)
+  : `<p>${escapeHtml(String(project.description || ''))}</p>`;
+
+const galleryHtml = (project.imageUrls || [])
+  .map((url) => `<img src="${escapeHtml(url)}" alt="${escapeHtml(project.title)}" loading="lazy" class="card" />`)
+  .join('');
+---
+
+<BaseLayout
+  locale={locale}
+  copy={copy}
+  title={project.title}
+  pathWithoutLocale={`/projects/${translatedSlug}`}
+>
+  <article class="project">
+    <header class="card section">
+      <h1>{project.title}</h1>
+      <p>{project.summary}</p>
+      <p><strong>{copy.module}:</strong> {project.moduleName}</p>
+    </header>
+
+    {project.videoEmbedUrl && (
+      <section class="section">
+        <h2>{copy.watch}</h2>
+        <VideoEmbed embedUrl={project.videoEmbedUrl} />
+      </section>
+    )}
+
+    {project.soundcloudUrl && (
+      <section class="section">
+        <h2>{copy.listen}</h2>
+        <SoundCloudEmbed trackUrl={project.soundcloudUrl} />
+      </section>
+    )}
+
+    {!project.soundcloudUrl && project.audioUrl && (
+      <section class="section">
+        <h2>{copy.listen}</h2>
+        <AudioPlayer src={project.audioUrl} />
+      </section>
+    )}
+
+    {project.imageUrls?.length > 0 && (
+      <section class="section">
+        <h2>{copy.gallery}</h2>
+        <div class="gallery" set:html={galleryHtml}></div>
+      </section>
+    )}
+
+    <section class="card section">
+      <h2>{copy.description}</h2>
+      <div class="rich-text" set:html={descriptionHtml}></div>
+      {project.techniques?.length > 0 && (
+        <p><strong>{copy.techniques}:</strong> {project.techniques.join(', ')}</p>
+      )}
+      {project.tools?.length > 0 && <p><strong>{copy.tools}:</strong> {project.tools.join(', ')}</p>}
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .project {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .section {
+    padding: var(--space-3);
+  }
+
+  .gallery {
+    display: grid;
+    gap: var(--space-2);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  .rich-text :global(p) {
+    margin: 0 0 var(--space-2);
+    white-space: pre-line;
+  }
+
+  .rich-text :global(h3),
+  .rich-text :global(h4) {
+    margin: var(--space-3) 0 var(--space-2);
+  }
+
+  .rich-text :global(ul),
+  .rich-text :global(ol) {
+    margin: 0 0 var(--space-2);
+    padding-left: 1.3rem;
+  }
+</style>

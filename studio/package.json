@@ -1,0 +1,16 @@
+{
+  "name": "studio",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sanity": "^3.74.0",
+    "styled-components": "^6.3.11"
+  }
+}

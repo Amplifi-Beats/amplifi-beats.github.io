@@ -1,0 +1,219 @@
+---
+import '../styles/tokens.css';
+import type { Locale } from '../lib/i18n';
+import type { getCopy } from '../lib/copy';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+
+interface Props {
+  locale: Locale;
+  copy: ReturnType<typeof getCopy>;
+  title?: string;
+  pathWithoutLocale?: string;
+}
+
+const { locale, copy, title, pathWithoutLocale = '' } = Astro.props as Props;
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const localeRoot = `/${locale}`;
+const isHomeActive = currentPath === localeRoot;
+const isProjectsActive = currentPath === `${localeRoot}/projects` || currentPath.startsWith(`${localeRoot}/projects/`);
+const isBlogActive = currentPath === `${localeRoot}/blog` || currentPath.startsWith(`${localeRoot}/blog/`);
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ? `${title} | ${copy.siteTitle}` : copy.siteTitle}</title>
+  </head>
+  <body>
+    <div class="wrapper page-shell">
+      <header class="header">
+        <a class="brand" href={`/${locale}`}>{copy.siteTitle}</a>
+        <nav aria-label="Primary">
+          <a
+            class={`icon-link ${isHomeActive ? 'active' : ''}`}
+            href={`/${locale}`}
+            aria-label={copy.navHome}
+            title={copy.navHome}
+            aria-current={isHomeActive ? 'page' : undefined}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 10.8 12 3l9 7.8v9.2a1 1 0 0 1-1 1h-5.5a1 1 0 0 1-1-1v-5h-3v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.2z" />
+            </svg>
+            <span>{copy.navHome}</span>
+          </a>
+          <a
+            class={`icon-link ${isProjectsActive ? 'active' : ''}`}
+            href={`/${locale}/projects`}
+            aria-label={copy.navProjects}
+            title={copy.navProjects}
+            aria-current={isProjectsActive ? 'page' : undefined}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h15A1.5 1.5 0 0 1 21 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5v-11zm4 2.5a1 1 0 1 0 0 2h10a1 1 0 1 0 0-2H7zm0 4a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H7z" />
+            </svg>
+            <span>{copy.navProjects}</span>
+          </a>
+          <a
+            class={`icon-link ${isBlogActive ? 'active' : ''}`}
+            href={`/${locale}/blog`}
+            aria-label={copy.navBlog}
+            title={copy.navBlog}
+            aria-current={isBlogActive ? 'page' : undefined}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H18a2 2 0 0 1 2 2v10.8a2.2 2.2 0 0 1-2.2 2.2H8.2A2.2 2.2 0 0 0 6 20.2V6.5A1.5 1.5 0 0 0 4 5.1V5.5zm4.5-.5A.5.5 0 0 0 8 5.5V18h9.8a.2.2 0 0 0 .2-.2V5.2a.2.2 0 0 0-.2-.2H8.5zm1.5 3a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-6zm0 4a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2h-4zM6.9 19.1l5.7-5.7 1.7 1.7-5.7 5.7H6.9v-1.7z" />
+            </svg>
+            <span>{copy.navBlog}</span>
+          </a>
+        </nav>
+        <LanguageSwitcher locale={locale} pathWithoutLocale={pathWithoutLocale} label={copy.switchLanguage} />
+      </header>
+      <main>
+        <slot />
+      </main>
+      <footer class="footer">
+        <p class="footer-line">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm0 4a4.5 4.5 0 0 1 3.7 1.9 1 1 0 1 1-1.6 1.1A2.5 2.5 0 1 0 14.1 14a1 1 0 1 1 1.6 1.1A4.5 4.5 0 1 1 12 8z" />
+          </svg>
+          <span>{copy.footerCopyright}</span>
+        </p>
+        <p class="footer-line">
+          <span>{copy.footerMadeInIreland}</span>
+          <span class="flag" aria-label="Ireland">🇮🇪</span>
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-shell {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+  }
+
+  main {
+    flex: 1 0 auto;
+    padding-top: var(--space-4);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    position: sticky;
+    top: 0;
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius);
+    border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+    margin-top: var(--space-3);
+    z-index: 1000;
+    isolation: isolate;
+  }
+
+  nav {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .brand {
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .icon-link {
+    height: 2.3rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    padding: 0 0.85rem;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 160ms ease, transform 160ms ease;
+  }
+
+  .icon-link:hover {
+    background: color-mix(in srgb, var(--accent) 18%, var(--paper));
+    transform: translateY(-1px);
+  }
+
+  .icon-link:focus-visible {
+    outline: 2px solid var(--accent-2);
+    outline-offset: 2px;
+  }
+
+  .icon-link.active {
+    background: color-mix(in srgb, var(--accent) 28%, var(--paper));
+    border-color: color-mix(in srgb, var(--accent) 52%, transparent);
+  }
+
+  .icon-link svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: currentColor;
+  }
+
+  .icon-link span {
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+
+  @media (max-width: 768px) {
+    .header {
+      flex-wrap: wrap;
+      padding: var(--space-2);
+    }
+  }
+
+  .footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto;
+    margin-bottom: var(--space-3);
+    border-top: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+    padding-top: var(--space-3);
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .footer p {
+    margin: 0.2rem 0;
+  }
+
+  .footer-line {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .footer-line svg {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+  }
+
+  .flag {
+    font-size: 1rem;
+    line-height: 1;
+  }
+</style>
