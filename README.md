@@ -1,6 +1,8 @@
 # Sound Engineering Portfolio
 
-Bilingual (English/Irish) portfolio powered by Astro (frontend) and Sanity (CMS).
+Bilingual (English/Irish) portfolio powered by Astro (frontend) and Sanity (CMS/CDN).
+
+N.B I don't recommend attempting to fork/pull/contribute/install/etc. as this is shamefully vibe-coded, I'm experimenting and I plan to reimplement from scratch when I get a better understanding of Astro
 
 ## Requirements
 
